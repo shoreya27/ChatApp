@@ -29,10 +29,4 @@ class RegisterViewController: UIViewController {
         
         }
     }
-    
-    
-    @IBAction func logoutPressed(_ sender: Any) {
-        navigationController?.popToRootViewController(animated: true)
-    }
-    
 }

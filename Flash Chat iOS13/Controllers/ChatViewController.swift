@@ -14,13 +14,15 @@ class ChatViewController: UIViewController {
     @IBOutlet weak var messageTextfield: UITextField!
     var message : [Messages] = [
         Messages(sender: "abcd@yo.in", body: "Hey!!"),
-        Messages(sender: "abcd@gmail.com", body: "Hello"),
+        Messages(sender: "abcd@gmail.com", body: "Hello, How are you ?? I am doing well, I am learning Ios Development with so much desire that I like to work in a great company one day like others. I also want to post picture of my goodie!!!"),
     ]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.hidesBackButton = true
         tableView.dataSource = self
+        tableView.register(UINib(nibName: K.cellNibName, bundle: nil),
+                           forCellReuseIdentifier: K.cellIdentifier)
     }
     
     @IBAction func logoutButtonPressed(_ sender: Any) {
@@ -44,8 +46,8 @@ extension ChatViewController:UITableViewDataSource{
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: K.cellIdentifier,
-                                                for: indexPath)
-        cell.textLabel?.text = message[indexPath.row].body
+                                                for: indexPath) as! MessageCell
+        cell.message.text = message[indexPath.row].body
         return cell
     }
         

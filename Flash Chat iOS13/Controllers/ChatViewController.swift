@@ -27,11 +27,14 @@ class ChatViewController: UIViewController {
     
     func loadMessages(){
         //read all messages from db and load
-        db.collection(K.FStore.collectionName).getDocuments { QuerySnapshot, Error in
+        db.collection(K.FStore.collectionName).order(
+                                                    by: "date"
+                                                    ).addSnapshotListener { QuerySnapshot, Error in
             if Error != nil{
                             print("error while reading data from the collection!")
                             }
             else{
+                self.message = []
                 for document in QuerySnapshot!.documents {
                     let data = document.data()
                     self.message.append(
@@ -63,7 +66,10 @@ class ChatViewController: UIViewController {
                 K.FStore.collectionName
             ).addDocument(
                 data: [K.FStore.senderField:sender,
-                       K.FStore.bodyField:message]) { err in
+                       K.FStore.bodyField:message,
+                       K.FStore.dateField:Date().timeIntervalSince1970
+                      ]
+                    ) { err in
                 if let error = err{
                     print("error in saving data \(error)")
                 }else{

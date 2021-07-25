@@ -12,10 +12,8 @@ class ChatViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var messageTextfield: UITextField!
-    var message : [Messages] = [
-        Messages(sender: "abcd@yo.in", body: "Hey!!"),
-        Messages(sender: "abcd@gmail.com", body: "Hello, How are you ?? I am doing well, I am learning Ios Development with so much desire that I like to work in a great company one day like others. I also want to post picture of my goodie!!!"),
-    ]
+    let db = Firestore.firestore()
+    var message : [Messages] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,6 +21,31 @@ class ChatViewController: UIViewController {
         tableView.dataSource = self
         tableView.register(UINib(nibName: K.cellNibName, bundle: nil),
                            forCellReuseIdentifier: K.cellIdentifier)
+        loadMessages()
+        print(message)
+    }
+    
+    func loadMessages(){
+        //read all messages from db and load
+        db.collection(K.FStore.collectionName).getDocuments { QuerySnapshot, Error in
+            if Error != nil{
+                            print("error while reading data from the collection!")
+                            }
+            else{
+                for document in QuerySnapshot!.documents {
+                    let data = document.data()
+                    self.message.append(
+                            Messages(sender: data[K.FStore.senderField] as? String ?? "",
+                                     body: data[K.FStore.bodyField] as? String ?? ""
+                                    )
+                        )
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
+                }
+            }
+        }
+        
     }
     
     @IBAction func logoutButtonPressed(_ sender: Any) {
@@ -35,6 +58,19 @@ class ChatViewController: UIViewController {
         
     }
     @IBAction func sendPressed(_ sender: UIButton) {
+        if let message = messageTextfield.text, let sender = Auth.auth().currentUser?.email {
+            db.collection(
+                K.FStore.collectionName
+            ).addDocument(
+                data: [K.FStore.senderField:sender,
+                       K.FStore.bodyField:message]) { err in
+                if let error = err{
+                    print("error in saving data \(error)")
+                }else{
+                    print("saved successfully!!!")
+                }
+            }
+        }
     }
     
 }

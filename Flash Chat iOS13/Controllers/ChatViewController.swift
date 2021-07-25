@@ -27,13 +27,16 @@ class ChatViewController: UIViewController {
     
     func loadMessages(){
         //read all messages from db and load
-        db.collection(K.FStore.collectionName).order(
-                                                    by: "date"
-                                                    ).addSnapshotListener { QuerySnapshot, Error in
+        print(Auth.auth().currentUser?.email as Any)
+        db.collection(K.FStore.collectionName)
+            .order(by: "date")
+            .whereField(K.FStore.senderField, isEqualTo: Auth.auth().currentUser?.email as Any)
+            .addSnapshotListener { QuerySnapshot, Error in
             if Error != nil{
                             print("error while reading data from the collection!")
                             }
             else{
+                print("okokokokokoko!!")
                 self.message = []
                 for document in QuerySnapshot!.documents {
                     let data = document.data()

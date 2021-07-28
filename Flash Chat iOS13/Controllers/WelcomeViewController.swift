@@ -17,7 +17,7 @@ class WelcomeViewController: UIViewController {
         super.viewDidLoad()
 
         titleLabel.text = K.appname
-        
+       // navigationController?.isNavigationBarHidden = true
         // titleLabel.text = ""
        //let text = "⚡️FlashChat"
        //var charIndex = 0.0
@@ -32,4 +32,13 @@ class WelcomeViewController: UIViewController {
         //}
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.isNavigationBarHidden = true
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.isNavigationBarHidden = false
+    }
 }

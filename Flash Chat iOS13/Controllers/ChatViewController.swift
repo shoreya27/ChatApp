@@ -84,6 +84,8 @@ class ChatViewController: UIViewController {
                 }
             }
         }
+        //emties the textfield
+        messageTextfield.text = ""
     }
     
 }

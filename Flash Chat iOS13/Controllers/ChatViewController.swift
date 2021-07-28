@@ -27,16 +27,14 @@ class ChatViewController: UIViewController {
     
     func loadMessages(){
         //read all messages from db and load
-        print(Auth.auth().currentUser?.email as Any)
         db.collection(K.FStore.collectionName)
             .order(by: "date")
-            .whereField(K.FStore.senderField, isEqualTo: Auth.auth().currentUser?.email as Any)
+            //.whereField(K.FStore.senderField, isEqualTo: Auth.auth().currentUser?.email as Any)
             .addSnapshotListener { QuerySnapshot, Error in
             if Error != nil{
                             print("error while reading data from the collection!")
                             }
             else{
-                print("okokokokokoko!!")
                 self.message = []
                 for document in QuerySnapshot!.documents {
                     let data = document.data()
@@ -44,10 +42,16 @@ class ChatViewController: UIViewController {
                             Messages(sender: data[K.FStore.senderField] as? String ?? "",
                                      body: data[K.FStore.bodyField] as? String ?? ""
                                     )
-                        )
-                    DispatchQueue.main.async {
-                        self.tableView.reloadData()
-                    }
+                                        )
+                }
+                //print(self.message)
+                DispatchQueue.main.async {
+                    self.tableView.reloadData()
+                    //scroll to last row
+                    self.tableView.scrollToRow(at: IndexPath(row: self.message.count - 1,
+                                                             section: 0),
+                                               at: .top,
+                                               animated: true)
                 }
             }
         }
@@ -90,9 +94,22 @@ extension ChatViewController:UITableViewDataSource{
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let message = message[indexPath.row]
         let cell = tableView.dequeueReusableCell(withIdentifier: K.cellIdentifier,
                                                 for: indexPath) as! MessageCell
-        cell.message.text = message[indexPath.row].body
+        cell.message.text = message.body
+        //if sender is current user , use different bg color and hide youAvatar
+        if message.sender == Auth.auth().currentUser?.email{
+            cell.youAvatar.isHidden = true
+            cell.meAvatar.isHidden = false
+            cell.messageBubble.backgroundColor = UIColor(named: K.BrandColors.blue)
+            cell.message.textColor = UIColor(named: K.BrandColors.lighBlue)
+        }else{
+            cell.meAvatar.isHidden = true
+            cell.youAvatar.isHidden = false
+            cell.messageBubble.backgroundColor = UIColor(named: K.BrandColors.purple)
+            cell.message.textColor = UIColor(named: K.BrandColors.lightPurple)
+        }
         return cell
     }
         
